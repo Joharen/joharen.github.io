@@ -1,43 +1,221 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-<title>Video Storage Demo</title>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Modern Video Storage</title>
+
 <style>
-body {
-    font-family: Arial;
-    background: #f0f2f5;
-    text-align: center;
-    padding: 20px;
+*{
+    margin:0;
+    padding:0;
+    box-sizing:border-box;
 }
 
-.box {
-    background: white;
-    padding: 20px;
-    max-width: 500px;
-    margin: auto;
-    border-radius: 10px;
-    box-shadow: 0 2px 10px rgba(0,0,0,0.2);
+body{
+    font-family:Arial,sans-serif;
+    background:linear-gradient(135deg,#141e30,#243b55);
+    min-height:100vh;
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    padding:20px;
+    color:white;
 }
 
-video {
-    width: 100%;
-    margin-top: 10px;
+.container{
+    width:100%;
+    max-width:900px;
+}
+
+.card{
+    background:rgba(255,255,255,0.08);
+    backdrop-filter:blur(10px);
+    border:1px solid rgba(255,255,255,0.15);
+    border-radius:20px;
+    padding:30px;
+    box-shadow:0 8px 32px rgba(0,0,0,0.3);
+}
+
+.header{
+    text-align:center;
+    margin-bottom:30px;
+}
+
+.header h1{
+    font-size:40px;
+    margin-bottom:10px;
+}
+
+.header p{
+    color:#cfd8dc;
+}
+
+.upload-area{
+    border:2px dashed rgba(255,255,255,0.3);
+    border-radius:15px;
+    padding:40px;
+    text-align:center;
+    transition:0.3s;
+    margin-bottom:20px;
+}
+
+.upload-area:hover{
+    background:rgba(255,255,255,0.05);
+    border-color:#4da3ff;
+}
+
+.upload-icon{
+    font-size:60px;
+    margin-bottom:15px;
+}
+
+input[type="file"]{
+    display:none;
+}
+
+.custom-file-upload{
+    display:inline-block;
+    padding:12px 25px;
+    cursor:pointer;
+    background:#1877f2;
+    border-radius:10px;
+    transition:0.3s;
+    font-weight:bold;
+}
+
+.custom-file-upload:hover{
+    background:#0d65d9;
+}
+
+.file-name{
+    margin-top:15px;
+    color:#ddd;
+    font-size:14px;
+}
+
+.buttons{
+    display:flex;
+    gap:15px;
+    justify-content:center;
+    flex-wrap:wrap;
+    margin-top:20px;
+}
+
+button{
+    border:none;
+    padding:14px 24px;
+    border-radius:12px;
+    cursor:pointer;
+    font-size:15px;
+    font-weight:bold;
+    transition:0.3s;
+}
+
+.save-btn{
+    background:#00c853;
+    color:white;
+}
+
+.save-btn:hover{
+    background:#00b248;
+}
+
+.load-btn{
+    background:#2962ff;
+    color:white;
+}
+
+.load-btn:hover{
+    background:#1c54f2;
+}
+
+.clear-btn{
+    background:#ff5252;
+    color:white;
+}
+
+.clear-btn:hover{
+    background:#f44336;
+}
+
+.video-section{
+    margin-top:30px;
+}
+
+video{
+    width:100%;
+    border-radius:15px;
+    margin-top:15px;
+    box-shadow:0 5px 20px rgba(0,0,0,0.4);
+}
+
+.status{
+    text-align:center;
+    margin-top:20px;
+    color:#90ee90;
+    font-size:14px;
+}
+
+.footer{
+    text-align:center;
+    margin-top:20px;
+    color:#b0bec5;
+    font-size:13px;
 }
 </style>
 </head>
 
 <body>
 
-<div class="box">
-    <h2>📹 Video Storage Demo</h2>
+<div class="container">
 
-    <input type="file" id="videoInput" accept="video/*">
-    <br><br>
+    <div class="card">
 
-    <button onclick="saveVideo()">Save Video</button>
-    <button onclick="loadVideo()">Load Video</button>
+        <div class="header">
+            <h1>🎥 VideoVault</h1>
+            <p>Modern Browser Video Storage Demo</p>
+        </div>
 
-    <div id="player"></div>
+        <div class="upload-area">
+
+            <div class="upload-icon">📁</div>
+
+            <label class="custom-file-upload">
+                Select Video
+                <input type="file" id="videoInput" accept="video/*">
+            </label>
+
+            <div class="file-name" id="fileName">
+                No video selected
+            </div>
+
+        </div>
+
+        <div class="buttons">
+            <button class="save-btn" onclick="saveVideo()">
+                💾 Save Video
+            </button>
+
+            <button class="load-btn" onclick="loadVideo()">
+                ▶ Load Video
+            </button>
+
+            <button class="clear-btn" onclick="clearVideo()">
+                🗑 Clear Storage
+            </button>
+        </div>
+
+        <div class="status" id="status"></div>
+
+        <div class="video-section" id="player"></div>
+
+        <div class="footer">
+            Local browser storage demo using IndexedDB
+        </div>
+
+    </div>
+
 </div>
 
 <script>
@@ -45,43 +223,85 @@ let db;
 
 const request = indexedDB.open("videoDB", 1);
 
-request.onupgradeneeded = function(e) {
+request.onupgradeneeded = function(e){
     db = e.target.result;
     db.createObjectStore("videos");
 };
 
-request.onsuccess = function(e) {
+request.onsuccess = function(e){
     db = e.target.result;
 };
 
-function saveVideo() {
+document.getElementById("videoInput").addEventListener("change", function(){
+    const file = this.files[0];
+
+    if(file){
+        document.getElementById("fileName").innerText =
+            "Selected: " + file.name;
+    }
+});
+
+function saveVideo(){
+
     const file = document.getElementById("videoInput").files[0];
-    if (!file) return alert("Select a video first");
+
+    if(!file){
+        alert("Please select a video first");
+        return;
+    }
 
     const tx = db.transaction("videos", "readwrite");
     const store = tx.objectStore("videos");
 
     store.put(file, "myVideo");
 
-    alert("Video saved locally ✔");
+    document.getElementById("status").innerText =
+        "✅ Video saved successfully";
 }
 
-function loadVideo() {
+function loadVideo(){
+
     const tx = db.transaction("videos", "readonly");
     const store = tx.objectStore("videos");
 
     const request = store.get("myVideo");
 
-    request.onsuccess = function() {
+    request.onsuccess = function(){
+
         const file = request.result;
-        if (!file) return alert("No video found");
+
+        if(!file){
+            alert("No saved video found");
+            return;
+        }
 
         const url = URL.createObjectURL(file);
 
         document.getElementById("player").innerHTML = `
-            <video controls src="${url}"></video>
+            <video controls>
+                <source src="${url}">
+            </video>
         `;
+
+        document.getElementById("status").innerText =
+            "▶ Video loaded";
     };
+}
+
+function clearVideo(){
+
+    const tx = db.transaction("videos", "readwrite");
+    const store = tx.objectStore("videos");
+
+    store.delete("myVideo");
+
+    document.getElementById("player").innerHTML = "";
+
+    document.getElementById("status").innerText =
+        "🗑 Storage cleared";
+
+    document.getElementById("fileName").innerText =
+        "No video selected";
 }
 </script>
 
