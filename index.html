@@ -1,141 +1,88 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Login Demo</title>
-
+<title>Video Storage Demo</title>
 <style>
-    body {
-        margin: 0;
-        font-family: Arial, sans-serif;
-        background: #f0f2f5;
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        height: 100vh;
-    }
+body {
+    font-family: Arial;
+    background: #f0f2f5;
+    text-align: center;
+    padding: 20px;
+}
 
-    .login-box {
-        background: white;
-        padding: 25px;
-        width: 320px;
-        border-radius: 10px;
-        box-shadow: 0 2px 10px rgba(0,0,0,0.2);
-    }
+.box {
+    background: white;
+    padding: 20px;
+    max-width: 500px;
+    margin: auto;
+    border-radius: 10px;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.2);
+}
 
-    h2 {
-        text-align: center;
-        color: #1877f2;
-    }
-
-    input {
-        width: 100%;
-        padding: 12px;
-        margin: 8px 0;
-        border: 1px solid #ddd;
-        border-radius: 6px;
-    }
-
-    .remember {
-        display: flex;
-        align-items: center;
-        font-size: 14px;
-        margin-top: 5px;
-    }
-
-    .login-btn {
-        width: 100%;
-        padding: 12px;
-        background: #1877f2;
-        border: none;
-        color: white;
-        font-size: 16px;
-        border-radius: 6px;
-        cursor: pointer;
-        margin-top: 10px;
-    }
-
-    .login-btn:hover {
-        background: #166fe5;
-    }
-
-    .status {
-        text-align: center;
-        margin-top: 10px;
-        font-size: 13px;
-        color: green;
-    }
+video {
+    width: 100%;
+    margin-top: 10px;
+}
 </style>
 </head>
 
 <body>
 
-<div class="login-box">
-    <h2>Login Demo</h2>
+<div class="box">
+    <h2>📹 Video Storage Demo</h2>
 
-    <input type="text" id="email" placeholder="Email or phone">
-    <input type="password" id="password" placeholder="Password">
+    <input type="file" id="videoInput" accept="video/*">
+    <br><br>
 
-    <div class="remember">
-        <input type="checkbox" id="rememberMe">
-        <label for="rememberMe">Remember me</label>
-    </div>
+    <button onclick="saveVideo()">Save Video</button>
+    <button onclick="loadVideo()">Load Video</button>
 
-    <button class="login-btn" onclick="login()">Log In</button>
-    <button class="login-btn" style="background:#42b72a;" onclick="clearData()">Clear Saved Data</button>
-
-    <div class="status" id="status"></div>
+    <div id="player"></div>
 </div>
 
 <script>
-    // Load saved data when page opens
-    window.onload = function () {
-        const savedEmail = localStorage.getItem("email");
-        const savedPassword = localStorage.getItem("password");
+let db;
 
-        if (savedEmail && savedPassword) {
-            document.getElementById("email").value = savedEmail;
-            document.getElementById("password").value = savedPassword;
-            document.getElementById("rememberMe").checked = true;
+const request = indexedDB.open("videoDB", 1);
 
-            document.getElementById("status").innerText = "Saved login loaded ✔";
-        }
+request.onupgradeneeded = function(e) {
+    db = e.target.result;
+    db.createObjectStore("videos");
+};
+
+request.onsuccess = function(e) {
+    db = e.target.result;
+};
+
+function saveVideo() {
+    const file = document.getElementById("videoInput").files[0];
+    if (!file) return alert("Select a video first");
+
+    const tx = db.transaction("videos", "readwrite");
+    const store = tx.objectStore("videos");
+
+    store.put(file, "myVideo");
+
+    alert("Video saved locally ✔");
+}
+
+function loadVideo() {
+    const tx = db.transaction("videos", "readonly");
+    const store = tx.objectStore("videos");
+
+    const request = store.get("myVideo");
+
+    request.onsuccess = function() {
+        const file = request.result;
+        if (!file) return alert("No video found");
+
+        const url = URL.createObjectURL(file);
+
+        document.getElementById("player").innerHTML = `
+            <video controls src="${url}"></video>
+        `;
     };
-
-    function login() {
-        const email = document.getElementById("email").value;
-        const password = document.getElementById("password").value;
-        const remember = document.getElementById("rememberMe").checked;
-
-        if (email === "" || password === "") {
-            alert("Please fill all fields");
-            return;
-        }
-
-        if (remember) {
-            localStorage.setItem("email", email);
-            localStorage.setItem("password", password);
-            document.getElementById("status").innerText = "Login saved ✔";
-        } else {
-            localStorage.removeItem("email");
-            localStorage.removeItem("password");
-            document.getElementById("status").innerText = "Login not saved";
-        }
-
-        alert("Logged in (demo only)");
-    }
-
-    function clearData() {
-        localStorage.removeItem("email");
-        localStorage.removeItem("password");
-
-        document.getElementById("email").value = "";
-        document.getElementById("password").value = "";
-        document.getElementById("rememberMe").checked = false;
-
-        document.getElementById("status").innerText = "Saved data cleared";
-    }
+}
 </script>
 
 </body>
