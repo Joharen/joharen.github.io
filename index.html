@@ -1,10 +1,124 @@
 <!DOCTYPE html>
-<html>
+<!DOCTYPE html>
+<html lang="en">
 <head>
-    <title>My Website</title>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Login Page</title>
+<style>
+    body {
+        margin: 0;
+        font-family: Arial, sans-serif;
+        background: #f0f2f5;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        height: 100vh;
+    }
+
+    .container {
+        display: flex;
+        gap: 60px;
+        align-items: center;
+        flex-wrap: wrap;
+        justify-content: center;
+    }
+
+    .left {
+        max-width: 400px;
+    }
+
+    .left h1 {
+        color: #1877f2;
+        font-size: 50px;
+        margin: 0;
+    }
+
+    .left p {
+        font-size: 20px;
+        color: #1c1e21;
+    }
+
+    .login-box {
+        background: white;
+        padding: 20px;
+        width: 320px;
+        border-radius: 10px;
+        box-shadow: 0 2px 10px rgba(0,0,0,0.2);
+    }
+
+    .login-box input {
+        width: 100%;
+        padding: 12px;
+        margin: 8px 0;
+        border: 1px solid #ddd;
+        border-radius: 6px;
+        font-size: 14px;
+    }
+
+    .login-btn {
+        width: 100%;
+        padding: 12px;
+        background: #1877f2;
+        border: none;
+        color: white;
+        font-size: 16px;
+        border-radius: 6px;
+        cursor: pointer;
+        margin-top: 10px;
+    }
+
+    .login-btn:hover {
+        background: #166fe5;
+    }
+
+    .link {
+        text-align: center;
+        margin-top: 10px;
+        font-size: 14px;
+    }
+
+    .link a {
+        color: #1877f2;
+        text-decoration: none;
+    }
+
+    .create-btn {
+        margin-top: 15px;
+        background: #42b72a;
+    }
+
+    .create-btn:hover {
+        background: #36a420;
+    }
+</style>
 </head>
-<body style="font-family: Arial; text-align:center; padding-top:50px;">
-    <h1>Hello World!</h1>
-    <p>This is my first GitHub website.</p>
+
+<body>
+
+<div class="container">
+
+    <div class="left">
+        <h1>SocialApp</h1>
+        <p>Connect with friends and the world around you in a simple way.</p>
+    </div>
+
+    <div class="login-box">
+        <input type="text" placeholder="Email or phone number">
+        <input type="password" placeholder="Password">
+
+        <button class="login-btn">Log In</button>
+
+        <div class="link">
+            <a href="#">Forgot password?</a>
+        </div>
+
+        <hr>
+
+        <button class="login-btn create-btn">Create New Account</button>
+    </div>
+
+</div>
+
 </body>
 </html>
